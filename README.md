@@ -83,6 +83,10 @@ If you apply the IPC patch to somebar, then
 **dwl must have the [wayland-ipc patch](https://git.sr.ht/~raphi/dwl/blob/master/patches/wayland-ipc.patch) applied too**,
 since dwl must implement the wayland extension too.
 
+## Other patches
+
+Like all suckless software, somebar can be customized via patches. You can find some patches in the contrib folder with descriptions written in them.
+
 ## License
 
 somebar - dwm-like bar for dwl
