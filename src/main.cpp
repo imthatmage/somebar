@@ -300,7 +300,8 @@ static void handleStdin(const std::string& line)
 		return;
 	if (command == "title") {
 		auto title = std::string {};
- 		std::getline(stream, title);
+		stream >> std::ws;
+		std::getline(stream, title);
 		mon->bar.setTitle(title);
 	} else if (command == "selmon") {
 		uint32_t selected;
@@ -326,6 +327,7 @@ static void handleStdin(const std::string& line)
 		mon->tags = tags;
 	} else if (command == "layout") {
 		auto layout = std::string {};
+		stream >> std::ws;
 		std::getline(stream, layout);
 		mon->bar.setLayout(layout);
 	}
