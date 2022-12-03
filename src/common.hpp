@@ -54,8 +54,14 @@ struct WlDeleter;
 template<typename T>
 using wl_unique_ptr = std::unique_ptr<T, WlDeleter<T>>;
 
+inline void wl_output_release_checked(wl_output* output) {
+	if (wl_output_get_version(output) >= WL_OUTPUT_RELEASE_SINCE_VERSION) {
+		wl_output_release(output);
+	}
+}
+
 WL_DELETER(wl_buffer, wl_buffer_destroy);
-WL_DELETER(wl_output, wl_output_release);
+WL_DELETER(wl_output, wl_output_release_checked);
 WL_DELETER(wl_pointer, wl_pointer_release);
 WL_DELETER(wl_seat, wl_seat_release);
 WL_DELETER(wl_surface, wl_surface_destroy);
