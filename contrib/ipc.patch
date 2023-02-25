@@ -193,7 +193,7 @@ index 0000000..390f5a1
 +	</interface>
 +</protocol>
 diff --git a/src/common.hpp b/src/common.hpp
-index aed4480..12a3e2e 100644
+index c905358..9b62a94 100644
 --- a/src/common.hpp
 +++ b/src/common.hpp
 @@ -10,6 +10,7 @@
@@ -219,7 +219,7 @@ index aed4480..12a3e2e 100644
  void spawn(Monitor&, const Arg& arg);
  void setCloexec(int fd);
  [[noreturn]] void die(const char* why);
-@@ -59,6 +67,7 @@ WL_DELETER(wl_output, wl_output_release);
+@@ -65,6 +73,7 @@ WL_DELETER(wl_output, wl_output_release_checked);
  WL_DELETER(wl_pointer, wl_pointer_release);
  WL_DELETER(wl_seat, wl_seat_release);
  WL_DELETER(wl_surface, wl_surface_destroy);
@@ -250,7 +250,7 @@ index 40a8c95..a9560cb 100644
  	{ ClkStatusText,   BTN_RIGHT,  spawn,      {.v = termcmd} },
  };
 diff --git a/src/main.cpp b/src/main.cpp
-index 6198d8b..9e7549a 100644
+index 6274959..01be870 100644
 --- a/src/main.cpp
 +++ b/src/main.cpp
 @@ -3,7 +3,6 @@
@@ -403,8 +403,8 @@ index 6198d8b..9e7549a 100644
 -	wl_display_roundtrip(display); // wait for xdg_output names before we read stdin
  }
  
- void setupStatusFifo()
-@@ -259,66 +331,6 @@ void setupStatusFifo()
+ bool createFifo(std::string path)
+@@ -273,68 +345,6 @@ void setupStatusFifo()
  	}
  }
  
@@ -435,7 +435,8 @@ index 6198d8b..9e7549a 100644
 -		return;
 -	if (command == "title") {
 -		auto title = std::string {};
-- 		std::getline(stream, title);
+-		stream >> std::ws;
+-		std::getline(stream, title);
 -		mon->bar.setTitle(title);
 -	} else if (command == "selmon") {
 -		uint32_t selected;
@@ -461,6 +462,7 @@ index 6198d8b..9e7549a 100644
 -		mon->tags = tags;
 -	} else if (command == "layout") {
 -		auto layout = std::string {};
+-		stream >> std::ws;
 -		std::getline(stream, layout);
 -		mon->bar.setLayout(layout);
 -	}
@@ -471,7 +473,7 @@ index 6198d8b..9e7549a 100644
  const std::string prefixStatus = "status ";
  const std::string prefixShow = "show ";
  const std::string prefixHide = "hide ";
-@@ -393,6 +405,10 @@ void onGlobalAdd(void*, wl_registry* registry, uint32_t name, const char* interf
+@@ -409,6 +419,10 @@ void onGlobalAdd(void*, wl_registry* registry, uint32_t name, const char* interf
  		xdg_wm_base_add_listener(xdgWmBase, &xdgWmBaseListener, nullptr);
  		return;
  	}
@@ -482,7 +484,7 @@ index 6198d8b..9e7549a 100644
  	if (wl_seat* wlSeat; reg.handle(wlSeat, wl_seat_interface, 7)) {
  		auto& seat = seats.emplace_back(Seat {name, wl_unique_ptr<wl_seat> {wlSeat}});
  		wl_seat_add_listener(wlSeat, &seatListener, &seat);
-@@ -494,10 +510,6 @@ int main(int argc, char* argv[])
+@@ -522,10 +536,6 @@ int main(int argc, char* argv[])
  		.fd = displayFd,
  		.events = POLLIN,
  	});
@@ -493,7 +495,7 @@ index 6198d8b..9e7549a 100644
  	if (fcntl(STDIN_FILENO, F_SETFL, O_NONBLOCK) < 0) {
  		diesys("fcntl F_SETFL");
  	}
-@@ -522,8 +534,6 @@ int main(int argc, char* argv[])
+@@ -550,8 +560,6 @@ int main(int argc, char* argv[])
  						ev.events = POLLIN;
  						waylandFlush();
  					}
