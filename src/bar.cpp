@@ -247,12 +247,16 @@ void Bar::renderTags()
 		renderComponent(tag.component);
 		auto indicators = std::min(tag.numClients, static_cast<int>(_bufs->height/2));
 		for (auto ind = 0; ind < indicators; ind++) {
-			auto w = ind == tag.focusedClient ? 7 : 1;
-			cairo_move_to(_painter, tag.component.x, ind*2+0.5);
-			cairo_rel_line_to(_painter, w, 0);
-			cairo_close_path(_painter);
-			cairo_set_line_width(_painter, 1);
-			cairo_stroke(_painter);
+      cairo_rectangle(_painter, tag.component.x+3, ind*2+2, 8, 8);
+      if(ind == tag.focusedClient) {
+        cairo_stroke_preserve(_painter);
+        cairo_fill(_painter);
+      }
+      else {
+        cairo_set_line_width(_painter, 1);
+        cairo_set_line_join(_painter, CAIRO_LINE_JOIN_MITER); 
+        cairo_stroke(_painter);
+      }
 		}
 	}
 }
@@ -265,6 +269,7 @@ void Bar::renderStatus()
 	cairo_rectangle(_painter, _x, 0, _bufs->width-_x+start, _bufs->height);
 	cairo_fill(_painter);
 
+  setColorScheme(colorInactive);
 	_x = start;
 	renderComponent(_statusCmp);
 }
