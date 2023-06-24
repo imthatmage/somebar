@@ -1,4 +1,4 @@
-# somebar - dwm-like bar for dwl
+# Forked somebar - dwm-like bar for dwl
 
 ![Screenshot](screenshot.png)
 
